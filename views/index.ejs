@@ -10,7 +10,7 @@
         <a href="/create">create</a>
         <ul>
             <% for( let index = 0; index < data.length; index++ ) { %>
-            <li><%= data[index] %></li>
+            <li><b><%= data[index].title %></b>, <%= data[index].body %></li>
             <% } %>
         </ul>
     </body>

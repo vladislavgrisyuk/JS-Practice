@@ -2,18 +2,24 @@ const express = require('express')
 
 const app = express()
 const bodyParser = require('body-parser')
-const data = {
-    id: 'Create',
-    name: 'this is name',
-}
+
+const Post = require('./models/post')
+
+console.log(Post.find({}))
+
 const arr = ['one', 'two', 'sex']
 app.use(bodyParser.urlencoded({ extended: true }))
 
-app.get('/', (req, res) => res.render('index.ejs', { data: arr }))
+app.get('/', (req, res) => {
+    Post.find({}).then((posts) => res.render('index.ejs', { data: posts }))
+})
 app.get('/create', (req, res) => res.render('create.ejs'))
 app.post('/create', (req, res) => {
-    arr.push(req.body.text)
-    res.render('index.ejs', { data: arr })
+    Post.create({
+        title: req.body.title,
+        body: req.body.body,
+    })
+    res.redirect('/')
 })
 
 module.exports = app
