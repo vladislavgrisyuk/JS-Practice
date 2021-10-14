@@ -1,25 +1,44 @@
-const express = require('express')
+const express = require('express');
+const bodyParser = require('body-parser');
+const path = require('path');
 
-const app = express()
-const bodyParser = require('body-parser')
+const Post = require('./models/post');
 
-const Post = require('./models/post')
+const app = express();
 
-console.log(Post.find({}))
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(
+	'/javascripts',
+	express.static(path.join(__dirname, 'node_modules', 'jquery', 'dist'))
+);
 
-const arr = ['one', 'two', 'sex']
-app.use(bodyParser.urlencoded({ extended: true }))
+app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
-    Post.find({}).then((posts) => res.render('index.ejs', { data: posts }))
-})
-app.get('/create', (req, res) => res.render('create.ejs'))
-app.post('/create', (req, res) => {
-    Post.create({
-        title: req.body.title,
-        body: req.body.body,
-    })
-    res.redirect('/')
-})
+	res.render('index.ejs');
+});
 
-module.exports = app
+app.get('/create', (req, res) => {
+	res.render('create');
+});
+
+app.get('/find', (req, res) => {
+	res.render('find');
+});
+
+app.post('/', (req, res) => {
+	Post.find({ title: { $regex: req.body.title, $options: 'i' } })
+		.exec()
+		.then(posts => {
+			res.render('find', { data: posts });
+		});
+});
+app.post('/create', (req, res) => {
+	Post.create({
+		title: req.body.title,
+	});
+	res.redirect('/create');
+});
+
+module.exports = app;
